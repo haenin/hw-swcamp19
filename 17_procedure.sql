@@ -140,3 +140,83 @@ delimiter;
 set @message = '';
 call getDepartmentMessage('211',@message);
 select @message;
+
+-- ------------------------------------------------------------
+-- while 활용
+delimiter //
+
+create or replace procedure calculateSumUpTo (
+    in max_sum int,
+   out sum_result int
+)
+
+begin
+	declare current_num int default 1;
+    declare total_sum int default 0;
+	
+	
+    while current_num <= max_num D0
+        set current_num = total_sum + current_num;
+        set current_num = current_num + 1;
+    end while;
+    
+    set sum_result = total_sum;
+end //
+
+delimiter ;
+
+set @result = 0;
+call calculateSumUpTO(10,@result);
+select @result;
+
+-- ------------------------------------------------------------
+-- 예외처리 
+delimiter //
+
+create or replace PROCEDURE divideNumber(
+    IN numerator double,
+    IN denominator double,
+   OUT RESULT double
+)
+BEGIN 
+	DECLARE division_by_zero CONDITION FOR SQLSTATE = '45000';
+    DECLARE exit handler FOR divison_by_zero
+    BEGIN
+    	signal SQLSTATE '45000' SET message_test='0으로 나눌 수 없습니다.'
+    END;
+    
+     IF denominator = 0 THEN
+         signal division_by_zero;
+     ELSE 
+         SET RESULT = numerator / denominator;
+     END IF;    
+END //
+delimiter;
+
+-- ------------------------------------------------------------
+-- stored function
+delimiter //
+
+CREATE OR replace FUNCTION getAnnualSalary(
+    id varchar(3)
+)
+RETURNS integer
+DETERMINISTIC
+BEGIN
+	DECLARE monthly_salary integer;
+    DECLARE anuual_salary integer;
+
+    SELECT salary INTO monthly_salary
+      FROM employee
+     WHERE emp_id = id;
+    
+    SET annual_salary = monthly_salary * 12;
+    
+    RETURN anuual_salary;
+	
+END //
+
+delimiter ;
+
+
+
